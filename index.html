@@ -1,11 +1,107 @@
+
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>TacoNewTest</title>
-    <link rel="stylesheet" href="styles.css">
-  </head>
-  <body>
-    <h1>Welcome to TacoNewTest!</h1>
-    <p>This is a simple HTML page.</p>
-  </body>
+<head>
+  <title>Taco Invaders</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <script>
+    // Game constants
+    const TACO_SPEED = 2;
+    const PLAYER_SPEED = 5;
+    const BULLET_SPEED = 10;
+
+    // Game state
+    let tacos = [];
+    let player = { x: 400, y: 550, width: 50, height: 50 };
+    let bullets = [];
+
+    // Canvas setup
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Game loop
+    function gameLoop() {
+      // Clear the canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Move and draw the tacos
+      for (let i = 0; i < tacos.length; i++) {
+        tacos[i].y += TACO_SPEED;
+        drawTaco(tacos[i]);
+      }
+
+      // Move and draw the player
+      if (37 in keysDown) { // Left
+        player.x -= PLAYER_SPEED;
+      }
+      if (39 in keysDown) { // Right
+        player.x += PLAYER_SPEED;
+      }
+      drawPlayer(player);
+
+      // Move and draw the bullets
+      for (let i = 0; i < bullets.length; i++) {
+        bullets[i].y -= BULLET_SPEED;
+        drawBullet(bullets[i]);
+      }
+
+      // Request the next frame
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Keyboard input tracking
+    const keysDown = {};
+    window.addEventListener("keydown", (event) => {
+      keysDown[event.keyCode] = true;
+      if (event.keyCode === 32) { // Space (shoot)
+        shootBullet();
+      }
+    });
+    window.addEventListener("keyup", (event) => {
+      delete keysDown[event.keyCode];
+    });
+
+    // Game functions
+    function drawTaco(taco) {
+      ctx.beginPath();
+      ctx.rect(taco.x, taco.y, 50, 50);
+      ctx.fillStyle = "yellow";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function drawPlayer(player) {
+      ctx.beginPath();
+      ctx.rect(player.x, player.y, player.width, player.height);
+      ctx.fillStyle = "brown";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function drawBullet(bullet) {
+      ctx.beginPath();
+      ctx.rect(bullet.x, bullet.y, 10, 20);
+      ctx.fillStyle = "red";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function shootBullet() {
+      bullets.push({ x: player.x + player.width / 2, y: player.y });
+    }
+
+    // Start the game
+    setInterval(() => {
+      tacos.push({ x: Math.random() * (canvas.width - 50), y: -50 });
+    }, 1000);
+    gameLoop();
+  </script>
+</body>
 </html>
